@@ -1,0 +1,325 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Slopdetector Settings</title>
+  <link rel="stylesheet" href="popup.css">
+</head>
+
+<body>
+  <div class="popup-container">
+    <div class="master-toggle">
+      <span class="toggle-label" id="toggleLabel">ON</span>
+      <label class="toggle-setting header-toggle">
+        <input type="checkbox" id="enableDetection" checked>
+        <span class="toggle-slider-v"></span>
+      </label>
+    </div>
+    <header class="header">
+      <div class="header-title-row">
+        <img src="../icons/slopmoji.png" class="logo-icon" alt="Slopdetector">
+        <h1 class="logo-text">Slopdetector</h1>
+      </div>
+      <p class="tagline">Social Media AI Content Detector</p>
+      <a href="https://buymeacoffee.com/vihrenp" target="_blank" class="donate-btn" title="Support this project">
+        <svg class="donate-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+          stroke-linecap="round" stroke-linejoin="round" width="16" height="16">
+          <path d="M18 8h1a4 4 0 0 1 0 8h-1" />
+          <path d="M2 8h16v9a4 4 0 0 1-4 4H6a4 4 0 0 1-4-4V8z" />
+          <line x1="6" y1="1" x2="6" y2="4" />
+          <line x1="10" y1="1" x2="10" y2="4" />
+          <line x1="14" y1="1" x2="14" y2="4" />
+        </svg>
+        Donate
+      </a>
+    </header>
+
+    <section>
+      <div class="status-card">
+        <div class="stats-tabs" id="statsTabs">
+          <button class="stats-tab active" data-range="day">Today</button>
+          <button class="stats-tab" data-range="week">Week</button>
+          <button class="stats-tab" data-range="month">Month</button>
+          <button class="stats-tab" data-range="all">All Time</button>
+          <div class="stats-tab-indicator" id="statsTabIndicator"></div>
+        </div>
+        <div class="stats-grid">
+          <div class="stat">
+            <span class="stat-value" id="postsScanned">
+              <span class="stat-number" id="postsScannedNum">0</span>
+            </span>
+            <span class="stat-label">Scanned</span>
+          </div>
+          <div class="stat">
+            <span class="stat-value stat-value-ai" id="aiDetected">
+              <span class="stat-number" id="aiDetectedNum">0</span>
+            </span>
+            <span class="stat-label">AI Detected</span>
+          </div>
+          <div class="stat stat-platform">
+            <div class="platform-pie-row">
+              <div class="platform-pie" id="platformPie"></div>
+              <div class="platform-legend" id="platformLegend">
+                <!-- Populated dynamically by popup.js -->
+              </div>
+            </div>
+            <span class="stat-label">By Platform</span>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section class="settings-section">
+      <div class="settings-divider"></div>
+      <div class="setting-group">
+        <label class="setting-label" for="modelProvider">AI Provider</label>
+        <div class="provider-row">
+          <div class="custom-select-container" id="providerSelect">
+            <div class="custom-select-trigger" tabindex="0">
+              <div class="selected-option">
+                <img src="../icons/lmstudio.jpg" class="provider-icon" alt="LM Studio" width="20" height="20">
+                <span>LM Studio (Local)</span>
+              </div>
+              <div class="arrow"></div>
+            </div>
+            <div class="custom-options">
+              <div class="custom-option selected" data-value="lmstudio">
+                <img src="../icons/lmstudio.jpg" class="provider-icon" alt="LM Studio" width="20" height="20">
+                <span>LM Studio (Local)</span>
+              </div>
+              <div class="custom-option" data-value="claude">
+                <img src="../icons/claude.png" class="provider-icon" alt="Claude" width="20" height="20">
+                <span>Anthropic API (Claude)</span>
+              </div>
+              <div class="custom-option" data-value="openai">
+                <img src="../icons/chatgpt.png" class="provider-icon" alt="OpenAI" width="20" height="20">
+                <span>OpenAI API (ChatGPT)</span>
+              </div>
+              <div class="custom-option" data-value="openrouter">
+                <img src="../icons/openrouter.png" class="provider-icon" alt="OpenRouter" width="20" height="20">
+                <span>OpenRouter API</span>
+              </div>
+            </div>
+          </div>
+          <!-- Hidden select to maintain compatibility with existing JS logic initially, 
+               though we will update JS to use the custom one -->
+          <select id="modelProvider" style="display: none;">
+            <option value="lmstudio">LM Studio (Local)</option>
+            <option value="claude">Anthropic API (Claude)</option>
+            <option value="openai">OpenAI API (ChatGPT)</option>
+            <option value="openrouter">OpenRouter API</option>
+          </select>
+        </div>
+      </div>
+
+      <div class="setting-group provider-settings" id="lmStudioSettings">
+        <label class="setting-label" for="lmStudioUrl">LM Studio URL</label>
+        <div class="url-status-row">
+          <input type="text" id="lmStudioUrl" placeholder="http://localhost:1234" class="text-input url-input">
+          <div class="status-indicator-small" id="connectionStatus">
+            <span class="status-dot"></span>
+          </div>
+        </div>
+        <p class="setting-hint">Enter the URL where LM Studio server is running</p>
+        <label class="setting-label" for="lmStudioModel">Model Name (optional)</label>
+        <input type="text" id="lmStudioModel" class="text-input">
+        <p class="setting-hint">Specify model name or leave empty to use currently loaded model</p>
+      </div>
+
+      <div class="setting-group provider-settings" id="openaiSettings" style="display: none;">
+        <label class="setting-label" for="openaiModel">Model</label>
+        <select id="openaiModel" class="select-input">
+          <option value="gpt-3.5-turbo">gpt-3.5-turbo</option>
+        </select>
+        <p class="setting-hint">Select a model from the list</p>
+        <label class="setting-label" for="openaiApiKey">OpenAI API Key</label>
+        <div class="api-key-container">
+          <input type="password" id="openaiApiKey" placeholder="sk-..." class="text-input api-key-input">
+          <span class="api-key-display" id="openaiKeyDisplay"></span>
+        </div>
+        <p class="setting-hint">Get your API key from <a href="https://platform.openai.com/api-keys"
+            target="_blank">platform.openai.com/api-keys</a></p>
+      </div>
+
+      <div class="setting-group provider-settings" id="claudeSettings" style="display: none;">
+        <label class="setting-label" for="claudeModel">Model</label>
+        <select id="claudeModel" class="select-input">
+          <option value="claude-sonnet-4-5">claude-sonnet-4-5</option>
+        </select>
+        <p class="setting-hint">Select a model from the list</p>
+        <label class="setting-label" for="claudeApiKey">Claude API Key</label>
+        <div class="api-key-container">
+          <input type="password" id="claudeApiKey" placeholder="sk-ant-..." class="text-input api-key-input">
+          <span class="api-key-display" id="claudeKeyDisplay"></span>
+        </div>
+        <p class="setting-hint">Get your API key from <a href="https://console.anthropic.com/settings/keys"
+            target="_blank">console.anthropic.com</a></p>
+      </div>
+
+      <div class="setting-group provider-settings" id="openrouterSettings" style="display: none;">
+        <label class="setting-label" for="openrouterModel">Model Name</label>
+        <input type="text" id="openrouterModel" placeholder="e.g., openai/gpt-4, anthropic/claude-3.5-sonnet"
+          class="text-input">
+        <p class="setting-hint">Enter the full model ID (see <a href="https://openrouter.ai/models"
+            target="_blank">available models</a>)</p>
+        <label class="setting-label" for="openrouterApiKey">OpenRouter API Key</label>
+        <div class="api-key-container">
+          <input type="password" id="openrouterApiKey" placeholder="sk-or-v1-..." class="text-input api-key-input">
+          <span class="api-key-display" id="openrouterKeyDisplay"></span>
+        </div>
+        <p class="setting-hint">Get your API key from <a href="https://openrouter.ai/keys"
+            target="_blank">openrouter.ai/keys</a></p>
+      </div>
+
+      <div class="settings-divider"></div>
+
+      <div class="setting-group">
+        <label class="toggle-setting">
+          <span class="setting-label">Show Certainty %</span>
+          <input type="checkbox" id="showCertainty">
+          <span class="toggle-slider"></span>
+        </label>
+        <p class="setting-hint">Display confidence percentage in results</p>
+      </div>
+
+      <div class="setting-group">
+        <label class="toggle-setting">
+          <span class="setting-label">Minimum Post Length (Words)</span>
+          <input type="checkbox" id="enableMinLength" checked>
+          <span class="toggle-slider"></span>
+        </label>
+        <p class="setting-hint">Hide scan buttons on posts shorter than this word count</p>
+        <div class="sub-setting" id="minLengthSettings">
+          <input type="number" id="minTextLength" min="25" max="200" class="text-input number-input">
+        </div>
+      </div>
+
+      <div class="setting-group">
+        <label class="toggle-setting">
+          <span class="setting-label">Detailed Reasoning</span>
+          <input type="checkbox" id="showReasoning">
+          <span class="toggle-slider"></span>
+        </label>
+        <p class="setting-hint">Display Human/AI signals in the results</p>
+        <div class="sub-setting" id="maxSignalsSettings">
+          <label class="setting-label" for="maxBulletPoints">Max Signals (Bullets)</label>
+          <input type="number" id="maxBulletPoints" min="1" max="5" class="text-input number-input">
+        </div>
+      </div>
+    </section>
+
+    <div class="settings-divider"></div>
+    <div class="reset-defaults-container" style="display:flex; flex-direction:column; gap:6px;">
+      <button id="resetSettings" class="btn btn-secondary btn-small" style="width: 100%;">
+        <span class="btn-icon">↺</span>
+        Reset all settings
+      </button>
+      <button id="clearStats" class="btn btn-secondary btn-small" style="width: 100%;">
+        <span class="btn-icon">📊</span>
+        Clear Scan History
+      </button>
+      <button id="resetApiKeys" class="btn btn-danger btn-small" style="width: 100%;">
+        <span class="btn-icon">🗑️</span>
+        Reset API Keys
+      </button>
+    </div>
+    <div class="settings-divider"></div>
+
+    <section class="settings-section experimental-section">
+      <div class="experimental-header" id="experimentalToggle">
+        <h2>Experimental Features</h2>
+        <button class="experimental-toggle-btn" id="experimentalChevron" aria-expanded="true">
+          <svg class="chevron-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"
+            stroke-linecap="round" stroke-linejoin="round">
+            <polyline points="6 9 12 15 18 9" />
+          </svg>
+        </button>
+      </div>
+      <div class="experimental-body" id="experimentalBody">
+        <p class="experimental-warning">Caution: modifying these settings may result in unintended behavior. Proceed
+          with caution.</p>
+        <div class="settings-divider"></div>
+
+        <div class="setting-group">
+          <label class="setting-label" for="temperature">Model Temperature</label>
+          <div class="range-container">
+            <input type="range" id="temperature" min="0" max="100" value="30" class="range-input">
+            <span class="range-value" id="temperatureValue">0.3</span>
+          </div>
+          <p class="setting-hint">Balance Creativity vs Precision (0 = Precise, 1 = Creative)</p>
+        </div>
+
+        <div class="setting-group">
+          <div class="label-row">
+            <label class="setting-label" for="customCorePrompt">System Prompt</label>
+            <button id="resetCorePrompt" class="btn btn-secondary btn-small btn-inline"
+              title="Reset to default">Reset</button>
+          </div>
+          <textarea id="customCorePrompt" class="text-input textarea-input" rows="6"
+            placeholder="Enter custom core instructions..."></textarea>
+        </div>
+
+        <div class="setting-group">
+          <div class="label-row">
+            <label class="setting-label" for="customOutputFormat">Output Format (JSON)</label>
+            <button id="resetOutputFormat" class="btn btn-secondary btn-small btn-inline"
+              title="Reset to default">Reset</button>
+          </div>
+          <textarea id="customOutputFormat" class="text-input textarea-input" rows="8"
+            placeholder="Enter custom JSON format..."></textarea>
+          <p class="setting-hint">Must be valid JSON structure.</p>
+        </div>
+
+        <div class="setting-group">
+          <div class="label-row">
+            <label class="setting-label">AI-content Score Sensitivity</label>
+            <button id="resetAnchors" class="btn btn-secondary btn-small btn-inline"
+              title="Reset to default">Reset</button>
+          </div>
+          <div class="zone-bar-container" id="zoneBarContainer">
+            <div class="zone-bar" id="zoneBar">
+              <div class="zone zone-human" data-zone="human"><span class="zone-label">Human</span></div>
+              <div class="zone-divider" data-key="likelyHuman" title="Drag to adjust"></div>
+              <div class="zone zone-prob-human" data-zone="probHuman"><span class="zone-label">Prob. Human</span></div>
+              <div class="zone-divider" data-key="ambiguous" title="Drag to adjust"></div>
+              <div class="zone zone-ambiguous" data-zone="ambiguous"><span class="zone-label">Ambiguous</span></div>
+              <div class="zone-divider" data-key="likelyAi" title="Drag to adjust"></div>
+              <div class="zone zone-likely-ai" data-zone="likelyAi"><span class="zone-label">Likely AI</span></div>
+              <div class="zone-divider" data-key="highAi" title="Drag to adjust"></div>
+              <div class="zone zone-high-ai" data-zone="highAi"><span class="zone-label">High AI</span></div>
+            </div>
+            <div class="zone-values" id="zoneValues">
+              <span class="zone-val" data-key="likelyHuman">20%</span>
+              <span class="zone-val" data-key="ambiguous">50%</span>
+              <span class="zone-val" data-key="likelyAi">65%</span>
+              <span class="zone-val" data-key="highAi">80%</span>
+            </div>
+            <div class="zone-legend">
+              <span>Clearly Human</span>
+              <span>Clearly AI</span>
+            </div>
+          </div>
+          <p class="setting-hint">Drag dividers to resize zones (min 5% gap).</p>
+        </div>
+      </div>
+    </section>
+
+    <footer class="popup-footer">
+      <a href="https://github.com/webs7er/Slopdetector" target="_blank" class="github-btn" title="View on GitHub">
+        <svg class="github-icon" viewBox="0 0 16 16" fill="currentColor" width="16" height="16">
+          <path
+            d="M8 0C3.58 0 0 3.58 0 8c0 3.54 2.29 6.53 5.47 7.59.4.07.55-.17.55-.38 0-.19-.01-.82-.01-1.49-2.01.37-2.53-.49-2.69-.94-.09-.23-.48-.94-.82-1.13-.28-.15-.68-.52-.01-.53.63-.01 1.08.58 1.23.82.72 1.21 1.87.87 2.33.66.07-.52.28-.87.51-1.07-1.78-.2-3.64-.89-3.64-3.95 0-.87.31-1.59.82-2.15-.08-.2-.36-1.02.08-2.12 0 0 .67-.21 2.2.82.64-.18 1.32-.27 2-.27.68 0 1.36.09 2 .27 1.53-1.04 2.2-.82 2.2-.82.44 1.1.16 1.92.08 2.12.51.56.82 1.27.82 2.15 0 3.07-1.87 3.75-3.65 3.95.29.25.54.73.54 1.48 0 1.07-.01 1.93-.01 2.2 0 .21.15.46.55.38A8.013 8.013 0 0016 8c0-4.42-3.58-8-8-8z" />
+        </svg>
+        View on GitHub
+      </a>
+    </footer>
+  </div>
+
+  <script src="../shared/config.js"></script>
+  <script src="../shared/stats.js"></script>
+  <script src="popup.js"></script>
+</body>
+
+</html>

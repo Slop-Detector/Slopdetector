@@ -1,0 +1,365 @@
+/* StopTheSlop - Content Script Styles */
+
+/* Scan Button Image Styles */
+.sts-btn-img {
+  width: 20px;
+  height: 20px;
+  object-fit: contain;
+  border-radius: 2px;
+  display: block;
+}
+
+/* Scan Button Styles */
+.sts-scan-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 28px;
+  height: 28px;
+  padding: 0;
+  margin: 0;
+  border: none;
+  border-radius: 50%;
+  font-size: 14px;
+  cursor: pointer;
+  background: transparent;
+  color: #000000;
+  transition: background 0.2s ease;
+  vertical-align: middle;
+  flex-shrink: 0;
+  line-height: 1;
+  position: relative;
+  box-sizing: border-box;
+}
+
+.sts-scan-btn:hover {
+  background: rgba(0, 0, 0, 0.1);
+}
+
+.sts-scan-btn:active,
+.sts-scan-btn:focus {
+  outline: none;
+  transform: none;
+}
+
+.sts-scan-btn>.sts-btn-img {
+  margin: auto;
+}
+
+/* Position button right next to overflow menu */
+.sts-scan-btn.sts-before-overflow,
+.sts-indicator.sts-before-overflow {
+  display: inline-flex;
+  margin-right: 2px;
+  margin-left: 4px;
+  vertical-align: middle;
+}
+
+/* Indicator Base Styles */
+.sts-indicator {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 28px;
+  height: 28px;
+  padding: 0;
+  margin: 0;
+  border: 1.5px solid rgba(255, 255, 255, 0.7);
+  border-radius: 50%;
+  font-size: 14px;
+  color: black;
+  cursor: default;
+  position: relative;
+  vertical-align: middle;
+  transition: all 0.2s ease;
+  background: transparent;
+  flex-shrink: 0;
+  line-height: 1;
+  box-sizing: border-box;
+}
+
+.sts-icon {
+  font-size: 14px;
+  line-height: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+  height: 100%;
+}
+
+.sts-icon .sts-btn-img {
+  display: block;
+  margin: auto;
+}
+
+/* Tooltip Styles */
+.sts-tooltip {
+  position: fixed;
+  background: #1a1a2e;
+  color: #ffffff;
+  padding: 10px 14px;
+  border-radius: 8px;
+  font-size: 12px;
+  line-height: 1.5;
+  white-space: pre-line;
+  max-width: 450px;
+  min-width: 280px;
+  width: max-content;
+  text-align: left;
+  opacity: 0;
+  visibility: hidden;
+  transition: opacity 0.2s ease, visibility 0.2s ease;
+  z-index: 2147483647 !important;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.4);
+  pointer-events: none;
+}
+
+.sts-tooltip::after {
+  content: '';
+  position: absolute;
+  top: 100%;
+  left: 50%;
+  transform: translateX(-50%);
+  border: 6px solid transparent;
+  border-top-color: #1a1a2e;
+}
+
+.sts-tooltip.sts-tooltip-bottom::after {
+  top: auto;
+  bottom: 100%;
+  border-top-color: transparent;
+  border-bottom-color: #1a1a2e;
+}
+
+.sts-indicator:hover .sts-tooltip,
+.sts-scan-btn:hover .sts-tooltip {
+  opacity: 1 !important;
+  visibility: visible !important;
+  display: block !important;
+}
+
+/* Status-specific Styles */
+.sts-pending {
+  border-color: transparent;
+  position: relative;
+}
+
+.sts-pending::before {
+  content: '';
+  position: absolute;
+  top: -1.5px;
+  left: -1.5px;
+  right: -1.5px;
+  bottom: -1.5px;
+  border-radius: 50%;
+  border: 1.5px solid transparent;
+  border-top-color: rgba(255, 255, 255, 0.9);
+  border-right-color: rgba(255, 255, 255, 0.3);
+  animation: sts-spin 0.8s linear infinite;
+  z-index: 10;
+}
+
+@keyframes sts-spin {
+  0% {
+    transform: rotate(0deg);
+  }
+
+  100% {
+    transform: rotate(360deg);
+  }
+}
+
+
+
+.sts-high {
+  border-color: #e74c3c;
+}
+
+.sts-medium {
+  border-color: #f1c40f;
+}
+
+.sts-likely-ai {
+  border-color: #e67e22;
+  /* Carrot Orange */
+}
+
+.sts-low {
+  border-color: #2ecc71;
+}
+
+.sts-human {
+  border-color: #2ecc71;
+}
+
+.sts-error {
+  border-color: #e74c3c;
+}
+
+/* Dark mode adjustments */
+@media (prefers-color-scheme: dark) {
+  .sts-tooltip {
+    background: #2d2d44;
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.5);
+  }
+
+  .sts-tooltip::after {
+    border-top-color: #2d2d44;
+  }
+
+  .sts-tooltip.sts-tooltip-bottom::after {
+    border-top-color: transparent;
+    border-bottom-color: #2d2d44;
+  }
+}
+
+/* Reddit-specific positioning adjustments */
+shreddit-post .sts-indicator,
+shreddit-post .sts-scan-btn,
+shreddit-comment .sts-indicator,
+shreddit-comment .sts-scan-btn {
+  margin-left: 12px;
+}
+
+.thing .sts-indicator,
+.thing .sts-scan-btn {
+  margin-left: 8px;
+}
+
+/* Ensure visibility on various Reddit themes */
+[data-theme="dark"] .sts-indicator,
+.res-nightmode .sts-indicator {
+  border: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+[data-theme="light"] .sts-indicator {
+  border: 1px solid rgba(0, 0, 0, 0.1);
+}
+
+/* Model Badge in Tooltip */
+/* Model Badge in Tooltip */
+.sts-tooltip-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 20px;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+  padding-bottom: 8px;
+  margin-bottom: 8px;
+}
+
+.sts-tooltip-brand {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.sts-header-icon {
+  width: 16px;
+  height: 16px;
+  border-radius: 2px;
+}
+
+.sts-header-title {
+  font-size: 11px;
+  font-weight: 700;
+  color: #fff;
+  letter-spacing: 0.5px;
+}
+
+.sts-tooltip-model {
+  display: block;
+  font-size: 10px;
+  color: #9ca3af;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.sts-tooltip-footer {
+  border-top: 1px solid rgba(255, 255, 255, 0.1);
+  padding-top: 8px;
+  margin-top: 8px;
+  font-size: 11px;
+  color: #9ca3af;
+  text-align: center;
+}
+
+/* Sections for split signals */
+.sts-tooltip-conclusion {
+  margin-bottom: 12px;
+  font-size: 12px;
+  line-height: 1.5;
+}
+
+.sts-tooltip-section {
+  margin-top: 8px;
+  padding-top: 8px;
+  border-top: 1px solid rgba(255, 255, 255, 0.05);
+}
+
+.sts-tooltip-section-header {
+  font-size: 11px;
+  font-weight: 700;
+  text-transform: uppercase;
+  margin-bottom: 4px;
+  letter-spacing: 0.5px;
+}
+
+.sts-header-human {
+  color: #2ecc71;
+}
+
+.sts-header-ai {
+  color: #e74c3c;
+}
+
+.sts-signal-list {
+  margin: 0;
+  padding-left: 16px;
+  list-style-type: disc;
+}
+
+.sts-signal-item {
+  margin-bottom: 3px;
+  color: #d1d5db;
+  /* Light gray */
+  font-size: 12px;
+}
+
+/* Verdict Title Styles */
+.sts-tooltip-verdict {
+  font-size: 15px;
+  font-weight: 700;
+  margin-bottom: 8px;
+  line-height: 1.4;
+}
+
+.sts-text-high {
+  color: #e74c3c;
+}
+
+.sts-text-likely-ai {
+  color: #e67e22;
+}
+
+.sts-text-medium {
+  color: #f1c40f;
+}
+
+.sts-text-low {
+  color: #2ecc71;
+}
+
+.sts-text-human {
+  color: #2ecc71;
+}
+
+.sts-text-error {
+  color: #e74c3c;
+}
+
+.sts-text-pending {
+  color: #ffffff;
+}
