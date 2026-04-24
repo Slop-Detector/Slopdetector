@@ -1,4 +1,4 @@
-﻿/* StopTheSlop - Popup Styles */
+/* StopTheSlop - Popup Styles */
 
 * {
   margin: 0;
@@ -108,7 +108,15 @@ body.disabled {
   z-index: 10;
 }
 
-/* Donate Button — below tagline, centered */
+/* Header Actions (Donate + Report) */
+.header-actions {
+  display: flex;
+  gap: 10px;
+  justify-content: center;
+  align-items: center;
+}
+
+/* Donate Button */
 .donate-btn {
   display: inline-flex;
   align-items: center;
@@ -137,6 +145,38 @@ body.disabled {
   width: 14px;
   height: 14px;
   stroke: #ffdd00;
+  flex-shrink: 0;
+}
+
+/* Report Button — side by side with donate */
+.report-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  padding: 5px 14px;
+  background: rgba(56, 189, 248, 0.1);
+  border: 1px solid rgba(56, 189, 248, 0.25);
+  border-radius: 8px;
+  color: #38bdf8;
+  font-size: 11px;
+  font-weight: 600;
+  text-decoration: none;
+  transition: background 0.3s, border-color 0.3s, transform 0.3s, box-shadow 0.3s;
+  letter-spacing: 0.3px;
+  flex-shrink: 0;
+}
+
+.report-btn:hover {
+  background: rgba(56, 189, 248, 0.2);
+  border-color: rgba(56, 189, 248, 0.45);
+  transform: translateY(-1px);
+  box-shadow: 0 2px 8px rgba(56, 189, 248, 0.15);
+}
+
+.report-icon {
+  width: 14px;
+  height: 14px;
+  stroke: #38bdf8;
   flex-shrink: 0;
 }
 

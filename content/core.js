@@ -65,7 +65,7 @@ class BaseAIDetector {
         if (this.settings.enabled) {
           if (this.settings.enableMinLength !== oldEnableMinLength ||
             this.settings.minTextLength !== oldMinTextLength) {
-            this.removeAllScanButtons();
+            this.removeAllScanButtons(true); // Keep existing indicators (pending or finished) visible
             this.buttonAddedElements = new WeakSet();
           }
           this.addScanButtonsToExistingPosts();
@@ -142,11 +142,23 @@ class BaseAIDetector {
     });
   }
 
+  isContextValid() {
+    try {
+      // Accessing chrome.runtime.id is usually safe, but calling an API 
+      // like getURL or sendMessage will throw if the context is invalidated.
+      return !!(typeof chrome !== 'undefined' && chrome.runtime && chrome.runtime.id);
+    } catch (e) {
+      return false;
+    }
+  }
+
   observeDOM() {
     let pendingNodes = [];
     const observer = new MutationObserver((mutations) => {
       if (!this.settings.enabled) return;
-      if (typeof chrome === 'undefined' || !chrome.runtime?.id) {
+      
+      if (!this.isContextValid()) {
+        console.debug('StopTheSlop: Extension context invalidated, stopping observer.');
         observer.disconnect();
         return;
       }
@@ -184,9 +196,26 @@ class BaseAIDetector {
     posts.forEach((post) => this.addScanButton(post));
   }
 
-  removeAllScanButtons() {
+  removeAllScanButtons(keepIndicators = false) {
     // Remove scan buttons
     document.querySelectorAll('.sts-scan-btn').forEach(btn => btn.remove());
+
+    if (keepIndicators) {
+      // If keeping indicators, we still want to clean up tooltips that aren't attached to them
+      // (e.g. tooltips from the scan buttons we just removed)
+      const activeTooltips = new Set(
+        Array.from(document.querySelectorAll('.sts-indicator'))
+          .map(ind => ind._tooltipEl)
+          .filter(Boolean)
+      );
+
+      document.querySelectorAll('body > .sts-tooltip').forEach(tip => {
+        if (!activeTooltips.has(tip)) {
+          tip.remove();
+        }
+      });
+      return;
+    }
 
     // Remove result/in-progress indicators (and their attached tooltips)
     document.querySelectorAll('.sts-indicator').forEach(indicator => {
@@ -255,6 +284,16 @@ class BaseAIDetector {
     return hash.toString();
   }
 
+  isValidForAnalysis(text) {
+    if (!text) return false;
+    const wordCount = this.countWords(text);
+    if (this.settings.enableMinLength) {
+      return wordCount >= this.settings.minTextLength;
+    }
+    // If min length check is disabled, still enforce a baseline of at least 2 words
+    return wordCount >= 2;
+  }
+
   addScanButton(postData, retryCount = 0) {
     if (!this.settings.enabled) return;
     const { element, type } = postData;
@@ -266,11 +305,8 @@ class BaseAIDetector {
     // Extract text once — needed for both the min-length check and the cache lookup
     const text = this.extractText(postData);
 
-    if (this.settings.enableMinLength) {
-      const wordCount = this.countWords(text);
-      if (wordCount < this.settings.minTextLength) {
-        return;
-      }
+    if (!this.isValidForAnalysis(text)) {
+      return;
     }
 
     // If this post was already analysed, restore the cached indicator instead of
@@ -289,11 +325,17 @@ class BaseAIDetector {
     this.buttonAddedElements.add(element);
 
     // Safety check for extension context
-    if (typeof chrome === 'undefined' || !chrome.runtime?.id) return;
+    if (!this.isContextValid()) return;
+
+    const iconUrl = chrome.runtime.getURL('icons/slopmoji.png');
+    if (iconUrl.includes('invalid')) {
+      console.debug('StopTheSlop: Invalid extension URL detected, aborting button creation.');
+      return;
+    }
 
     const button = document.createElement('button');
     button.className = 'sts-scan-btn';
-    button.innerHTML = `<img src="${chrome.runtime.getURL('icons/slopmoji.png')}" class="sts-btn-img" alt="Check AI">`;
+    button.innerHTML = `<img src="${iconUrl}" class="sts-btn-img" alt="Check AI">`;
 
     const providerName = this.getProviderDisplayName();
     const tooltip = document.createElement('div');
@@ -404,10 +446,9 @@ class BaseAIDetector {
     if (this.analysisQueue.some(item => item.element === element)) return;
 
     const text = this.extractText(postData);
-    const wordCount = this.countWords(text);
 
-    if (!text || wordCount < 5) {
-      console.log('StopTheSlop: Text too short, skipping');
+    if (!this.isValidForAnalysis(text)) {
+      console.log('StopTheSlop: Text too short or invalid, skipping');
       return;
     }
 
@@ -600,10 +641,15 @@ class BaseAIDetector {
     let icon, statusClass, basicTooltip;
 
     if (status === 'pending') {
-      const slopmojiUrl = (typeof chrome !== 'undefined' && chrome.runtime?.id)
-        ? chrome.runtime.getURL('icons/slopmoji.png')
-        : '';
-      icon = `<img src="${slopmojiUrl}" class="sts-btn-img" alt="Analyzing">`;
+      let slopmojiUrl = '';
+      if (this.isContextValid()) {
+        slopmojiUrl = chrome.runtime.getURL('icons/slopmoji.png');
+        if (slopmojiUrl.includes('invalid')) slopmojiUrl = '';
+      }
+      
+      icon = slopmojiUrl 
+        ? `<img src="${slopmojiUrl}" class="sts-btn-img" alt="Analyzing">`
+        : '⏳';
       statusClass = 'sts-pending';
       basicTooltip = 'Analyzing...';
     } else if (status === 'error') {

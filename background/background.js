@@ -173,8 +173,9 @@ class BackgroundService {
       return { connected: true, provider: this.settings.modelProvider };
     }
 
+    const baseUrl = this.settings.lmStudioUrl || 'http://localhost:1234';
     try {
-      const response = await fetch(`${this.settings.lmStudioUrl}/v1/models`, {
+      const response = await fetch(`${baseUrl}/v1/models`, {
         method: 'GET',
         headers: {
           'Content-Type': 'application/json'
@@ -196,8 +197,9 @@ class BackgroundService {
   }
 
   async getLMStudioModels() {
+    const baseUrl = this.settings.lmStudioUrl || 'http://localhost:1234';
     try {
-      const response = await fetch(`${this.settings.lmStudioUrl}/v1/models`, {
+      const response = await fetch(`${baseUrl}/v1/models`, {
         method: 'GET',
         headers: {
           'Content-Type': 'application/json'
@@ -523,8 +525,10 @@ class BackgroundService {
         headers: {
           'Content-Type': 'application/json',
           'Authorization': `Bearer ${this.settings.openrouterApiKey}`,
-          'HTTP-Referer': chrome.runtime.getURL(''),
-          'X-Title': 'StopTheSlop'
+          'HTTP-Referer': chrome.runtime.getURL('').includes('invalid') 
+            ? 'https://github.com/Slop-Detector/Slopdetector' 
+            : chrome.runtime.getURL(''),
+          'X-Title': 'Slopdetector'
         },
         body: JSON.stringify({
           model: this.settings.openrouterModel || 'openai/gpt-3.5-turbo',
@@ -626,9 +630,10 @@ class BackgroundService {
 
   async analyzeWithLMStudio(text, platform) {
     const prompt = this.buildAnalysisPrompt(text);
+    const baseUrl = this.settings.lmStudioUrl || 'http://localhost:1234';
 
     try {
-      const response = await fetch(`${this.settings.lmStudioUrl}/v1/chat/completions`, {
+      const response = await fetch(`${baseUrl}/v1/chat/completions`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json'
