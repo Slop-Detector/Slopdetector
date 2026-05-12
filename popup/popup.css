@@ -84,7 +84,16 @@ body.disabled {
   align-items: center;
   justify-content: center;
   gap: 10px;
-  width: 100%;
+  width: fit-content;
+  margin: 0 auto;
+  text-decoration: none;
+  cursor: pointer;
+  transition: transform 0.3s, filter 0.3s;
+}
+
+.header-title-row:hover {
+  transform: translateY(-1px);
+  filter: drop-shadow(0 0 5px rgba(118, 75, 162, 0.4));
 }
 
 .logo-text {
@@ -186,38 +195,43 @@ body.disabled {
   padding-top: 16px;
   margin-top: 10px;
   border-top: 1px solid rgba(255, 255, 255, 0.1);
+  display: flex;
+  justify-content: center;
+  gap: 10px;
 }
 
-.github-btn {
+.github-btn, .website-btn {
   display: inline-flex;
   align-items: center;
+  justify-content: center;
   gap: 6px;
-  padding: 8px 16px;
+  padding: 8px 12px;
   background: rgba(255, 255, 255, 0.06);
   border: 1px solid rgba(255, 255, 255, 0.1);
   border-radius: 8px;
   color: #8892b0;
-  font-size: 12px;
+  font-size: 11px;
   font-weight: 500;
   text-decoration: none;
   transition: all 0.3s;
+  flex: 1;
 }
 
-.github-btn:hover {
+.github-btn:hover, .website-btn:hover {
   background: rgba(255, 255, 255, 0.12);
   color: #e0e0e0;
   border-color: rgba(255, 255, 255, 0.2);
   transform: translateY(-1px);
 }
 
-.github-icon {
-  width: 16px;
-  height: 16px;
+.github-icon, .website-icon {
+  width: 14px;
+  height: 14px;
   opacity: 0.7;
   transition: opacity 0.3s;
 }
 
-.github-btn:hover .github-icon {
+.github-btn:hover .github-icon, .website-btn:hover .website-icon {
   opacity: 1;
 }
 

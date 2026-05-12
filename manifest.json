@@ -1,7 +1,7 @@
 {
   "manifest_version": 3,
-  "name": "Slopdetector - AI Content Detector",
-  "version": "1.2.0",
+  "name": "Slopdetector - Social Media AI Content Detector",
+  "version": "1.2.1",
   "description": "Detect AI-generated content on social media using LLM API providers or LM Studio",
   "permissions": [
     "storage"
